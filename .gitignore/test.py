@@ -114,12 +114,10 @@ def update_naukri_profile():
         # Click on "Update Resume" button
         print("Looking for Update Resume button...")
         try:
-            # # Method 1: By text
-            # update_resume_btn = WebDriverWait(driver, 10).until(
-            #     EC.element_to_be_clickable((By.XPATH, "//button[contains(text(), 'Update resume')]"))
-            # )
-            # update_resume_btn.click()
-            update_resume_btn = WebDriverWait(driver, 20).until(EC.element_to_be_clickable((By.XPATH, "//input[@value='Update resume']")))
+            # Method 1: By text
+            update_resume_btn = WebDriverWait(driver, 10).until(
+                EC.element_to_be_clickable((By.XPATH, "//button[contains(text(), 'Update resume')]"))
+            )
             update_resume_btn.click()
         except:
             try:
