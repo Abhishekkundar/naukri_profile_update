@@ -6,12 +6,18 @@ import time
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
+from dotenv import load_dotenv
 import os
+
+# Load environment variables
+load_dotenv()
 
 # Configuration
 RESUME_PATH = r"D:\abhi\Abhishek_Resume.pdf"  # Update this with your resume path
-NAUKRI_EMAIL = "itsabhikundar17@gmail.com"  # Update with your email
-NAUKRI_PASSWORD = ""  # Update with your password
+NAUKRI_EMAIL = os.getenv("NAUKRI_EMAIL")
+NAUKRI_PASSWORD = os.getenv("NAUKRI_PASSWORD")
+print("email is",NAUKRI_EMAIL)
+print("Password loaded",NAUKRI_PASSWORD is not None)
 
 def update_naukri_profile():
     """Main function to update Naukri profile"""
@@ -33,14 +39,9 @@ def update_naukri_profile():
     # chrome_options.add_argument("--profile-directory=Profile 1")
     
     # Additional options for stability
-    chrome_options.add_argument("--disable-blink-features=AutomationControlled")
-    chrome_options.add_argument("--no-sandbox")
-    chrome_options.add_argument("--disable-dev-shm-usage")
-    chrome_options.add_argument("--disable-gpu")
-    chrome_options.add_argument("--start-maximized")
-    chrome_options.add_experimental_option("excludeSwitches", ["enable-automation"])
-    chrome_options.add_experimental_option('useAutomationExtension', False)
     
+    chrome_options.add_argument("--start-maximized")
+    chrome_options.add_argument("--disable-blink-features=AutomationControlled")
     driver = None
     
     try:
