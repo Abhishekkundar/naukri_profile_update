@@ -6,12 +6,18 @@ import time
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
+from dotenv import load_dotenv
 import os
+
+# Load environment variables
+load_dotenv()
 
 # Configuration
 RESUME_PATH = r"D:\abhi\Abhishek_Resume.pdf"  # Update this with your resume path
-NAUKRI_EMAIL = "your_email@example.com"  # Update with your email
-NAUKRI_PASSWORD = "your_password"  # Update with your password
+NAUKRI_EMAIL = os.getenv("NAUKRI_EMAIL")
+NAUKRI_PASSWORD = os.getenv("NAUKRI_PASSWORD")
+print("email is",NAUKRI_EMAIL)
+print("Password loaded",NAUKRI_PASSWORD is not None)
 
 def update_naukri_profile():
     """Main function to update Naukri profile"""
@@ -25,16 +31,18 @@ def update_naukri_profile():
     
     chrome_options = Options()
     
-    # Use your Chrome profile (optional - remove if you want to login each time)
-    chrome_options.add_argument(
-        r"--user-data-dir=C:\Users\DELL\AppData\Local\Google\Chrome\User Data"
-    )
-    chrome_options.add_argument("--profile-directory=Profile 1")
+    # IMPORTANT: Close all Chrome windows before running the script
+    # Comment out these lines if you want to login manually each time
+    # chrome_options.add_argument(
+    #     r"--user-data-dir=C:\Users\DELL\AppData\Local\Google\Chrome\User Data"
+    # )
+    # chrome_options.add_argument("--profile-directory=Profile 1")
     
     # Additional options for stability
+    
+    chrome_options.add_argument("--start-maximized")
     chrome_options.add_argument("--disable-blink-features=AutomationControlled")
-    chrome_options.add_experimental_option("excludeSwitches", ["enable-automation"])
-    chrome_options.add_experimental_option('useAutomationExtension', False)
+    driver = None
     
     try:
         # Initialize driver
@@ -107,10 +115,12 @@ def update_naukri_profile():
         # Click on "Update Resume" button
         print("Looking for Update Resume button...")
         try:
-            # Method 1: By text
-            update_resume_btn = WebDriverWait(driver, 10).until(
-                EC.element_to_be_clickable((By.XPATH, "//button[contains(text(), 'Update resume')]"))
-            )
+            # # Method 1: By text
+            # update_resume_btn = WebDriverWait(driver, 10).until(
+            #     EC.element_to_be_clickable((By.XPATH, "//button[contains(text(), 'Update resume')]"))
+            # )
+            # update_resume_btn.click()
+            update_resume_btn = WebDriverWait(driver, 20).until(EC.element_to_be_clickable((By.XPATH, "//input[@value='Update resume']")))
             update_resume_btn.click()
         except:
             try:
@@ -186,17 +196,19 @@ def update_naukri_profile():
         print(f"An error occurred: {str(e)}")
         # Take screenshot for debugging
         try:
-            driver.save_screenshot("error_screenshot.png")
-            print("Error screenshot saved as 'error_screenshot.png'")
+            if driver:
+                driver.save_screenshot("error_screenshot.png")
+                print("Error screenshot saved as 'error_screenshot.png'")
         except:
             pass
     
     finally:
         # Close browser
-        print("Closing browser...")
-        time.sleep(2)
-        driver.quit()
-        print("Browser closed.")
+        if driver:
+            print("Closing browser...")
+            time.sleep(2)
+            driver.quit()
+            print("Browser closed.")
 
 # Main execution
 if __name__ == "__main__":
