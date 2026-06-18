@@ -8,6 +8,7 @@ from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from dotenv import load_dotenv
 import os
+import sys
 
 # Load environment variables
 load_dotenv()
@@ -208,6 +209,7 @@ def update_naukri_profile():
             print("Closing browser...")
             time.sleep(2)
             driver.quit()
+            sys.exit(0)
             print("Browser closed.")
 
 # Main execution
