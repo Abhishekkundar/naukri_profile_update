@@ -8,6 +8,12 @@ The project follows automation best practices including secure credential manage
 
 ---
 
+## Project Status
+
+✅ Completed (Version 1.0)
+
+This project successfully automates Naukri profile updates using Selenium WebDriver, secure environment variables, logging, screenshot capture, and Windows Task Scheduler.
+
 ## Features
 
 * Automated login to Naukri
