@@ -3,6 +3,7 @@ from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.chrome.service import Service
 from webdriver_manager.chrome import ChromeDriverManager
 import time
+from datetime import  datetime
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
@@ -12,13 +13,19 @@ import sys
 
 # Load environment variables
 load_dotenv()
+os.makedirs("screenshots", exist_ok=True)
 
 # Configuration
-RESUME_PATH = r"D:\abhi\Abhishek_Resume.pdf"  # Update this with your resume path
+
+RESUME_PATH=os.getenv("RESUME_PATH")
 NAUKRI_EMAIL = os.getenv("NAUKRI_EMAIL")
 NAUKRI_PASSWORD = os.getenv("NAUKRI_PASSWORD")
 print("email is",NAUKRI_EMAIL)
 print("Password loaded",NAUKRI_PASSWORD is not None)
+
+def log(msg): 
+    with open("automation.log", "a") as f:
+        f.write(f"{datetime.now()} - {msg}\n")
 
 def update_naukri_profile():
     """Main function to update Naukri profile"""
@@ -28,18 +35,10 @@ def update_naukri_profile():
         print(f"Error: Resume file not found at {RESUME_PATH}")
         return
     
-    print("Initializing browser...")
+    log("Initializing Browser")
     
     chrome_options = Options()
     
-    # IMPORTANT: Close all Chrome windows before running the script
-    # Comment out these lines if you want to login manually each time
-    # chrome_options.add_argument(
-    #     r"--user-data-dir=C:\Users\DELL\AppData\Local\Google\Chrome\User Data"
-    # )
-    # chrome_options.add_argument("--profile-directory=Profile 1")
-    
-    # Additional options for stability
     
     chrome_options.add_argument("--start-maximized")
     chrome_options.add_argument("--disable-blink-features=AutomationControlled")
@@ -53,11 +52,11 @@ def update_naukri_profile():
         )
         
         driver.maximize_window()
-        print("Browser opened successfully.")
+        log("Browser Opened Successfully")
         
         # Open Naukri
         driver.get("https://www.naukri.com/")
-        print("Navigated to Naukri.com")
+        log("Navigated to Naukri.com")
         time.sleep(3)
         
         # Check if already logged in, if not, perform login
@@ -66,7 +65,7 @@ def update_naukri_profile():
             login_button = WebDriverWait(driver, 5).until(
                 EC.presence_of_element_located((By.ID, "login_Layer"))
             )
-            print("Not logged in. Attempting to login...")
+            log("Not logged in. Attempting to login...")
             
             # Click login button
             login_button.click()
@@ -89,14 +88,14 @@ def update_naukri_profile():
             # Click login submit button
             login_submit = driver.find_element(By.XPATH, "//button[@type='submit' and text()='Login']")
             login_submit.click()
-            print("Login credentials submitted.")
+            log("Login credentials submitted.")
             time.sleep(5)
             
         except:
             print("Already logged in or login element not found.")
         
         # Navigate to profile/resume section
-        print("Navigating to profile section...")
+        log("Navigating to profile section...")
         
         # Click on "View Profile" or navigate directly to profile update page
         try:
@@ -105,16 +104,16 @@ def update_naukri_profile():
                 EC.element_to_be_clickable((By.XPATH, "//a[@href='/mnjuser/profile']"))
             )
             view_profile.click()
-            print("Clicked on View Profile")
+            log("Clicked on View Profile")
             time.sleep(3)
         except:
             # Alternative: Direct navigation
             driver.get("https://www.naukri.com/mnjuser/profile")
-            print("Navigated directly to profile page")
+            log("Navigated directly to profile page")
             time.sleep(3)
         
         # Click on "Update Resume" button
-        print("Looking for Update Resume button...")
+        log("Looking for Update Resume button...")
         try:
             # # Method 1: By text
             # update_resume_btn = WebDriverWait(driver, 10).until(
@@ -137,11 +136,11 @@ def update_naukri_profile():
                 )
                 update_resume_btn.click()
         
-        print("Clicked on Update Resume button")
+        log("Clicked on Update Resume button")
         time.sleep(2)
         
         # Upload resume file
-        print("Uploading resume...")
+        log("Uploading resume...")
         
         # Find file input element
         file_input = WebDriverWait(driver, 10).until(
@@ -150,7 +149,7 @@ def update_naukri_profile():
         
         # Send file path to input
         file_input.send_keys(RESUME_PATH)
-        print(f"Resume file selected: {RESUME_PATH}")
+        log(f"Resume file selected: {RESUME_PATH}")
         time.sleep(3)
         
         # Click Save/Upload button
@@ -159,25 +158,25 @@ def update_naukri_profile():
                 EC.element_to_be_clickable((By.XPATH, "//button[contains(text(), 'Save') or contains(text(), 'Upload')]"))
             )
             save_button.click()
-            print("Clicked Save/Upload button")
+            log("Clicked Save/Upload button")
             time.sleep(5)
         except:
-            print("Save button not found or resume auto-uploaded")
+            log("Save button not found or resume auto-uploaded")
         
         # Verify success
         try:
             success_message = WebDriverWait(driver, 10).until(
                 EC.presence_of_element_located((By.XPATH, "//*[contains(text(), 'successfully') or contains(text(), 'updated')]"))
             )
-            print("✓ Profile updated successfully!")
+            log("✓ Profile updated successfully!")
         except:
-            print("Success message not found, but resume likely uploaded")
+            log("Success message not found, but resume likely uploaded")
         
         time.sleep(3)
         
         # Logout (optional)
         try:
-            print("Logging out...")
+            log("Logging out...")
             # Click on profile dropdown
             profile_dropdown = driver.find_element(By.XPATH, "//div[@class='nI-gNb-drawer__icon']")
             profile_dropdown.click()
@@ -186,31 +185,56 @@ def update_naukri_profile():
             # Click logout
             logout_btn = driver.find_element(By.XPATH, "//a[contains(text(), 'Logout')]")
             logout_btn.click()
-            print("Logged out successfully")
+            log("Logged out successfully")
             time.sleep(2)
         except:
-            print("Logout not performed (optional step)")
+            log("Logout not performed (optional step)")
         
-        print("Automation completed successfully!")
+        log("Automation completed successfully!")
         
+    # except Exception as e:
+    #     log(f"An error occurred: {str(e)}")
+    #     # Take screenshot for debugging
+    #     try:
+    #         if driver:
+    #             driver.save_screenshot("error_screenshot.png")
+    #             log("Error screenshot saved as 'error_screenshot.png'")
+    #     except:
+    #
+    # except Exception as e:
     except Exception as e:
+
+        log(f"ERROR: {str(e)}")
+
         print(f"An error occurred: {str(e)}")
-        # Take screenshot for debugging
-        try:
-            if driver:
-                driver.save_screenshot("error_screenshot.png")
-                print("Error screenshot saved as 'error_screenshot.png'")
-        except:
-            pass
+
+    try:
+        if driver:
+
+            timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+
+            screenshot_name = f"error_{timestamp}.png"
+
+            driver.save_screenshot(screenshot_name)
+
+            log(f"Screenshot saved: {screenshot_name}")
+
+            print(f"Screenshot saved: {screenshot_name}")
+
+    except Exception as screenshot_error:
+
+        log(f"Screenshot Error: {str(screenshot_error)}")
+        pass
     
     finally:
         # Close browser
         if driver:
-            print("Closing browser...")
+            log("Closing browser...")
             time.sleep(2)
             driver.quit()
+            log("Browser closed.")
             sys.exit(0)
-            print("Browser closed.")
+            
 
 # Main execution
 if __name__ == "__main__":
@@ -222,5 +246,5 @@ if __name__ == "__main__":
     update_naukri_profile()
     
     print("=" * 50)
-    print("Script execution completed!")
+    log("Script execution completed!")
     print("=" * 50)
